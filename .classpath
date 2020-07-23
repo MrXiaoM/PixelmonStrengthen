@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="lib" path="libs/forge-1.12.2-14.23.1.2555-srgBin.jar"/>
+	<classpathentry kind="lib" path="libs/okhttp-3.4.1.jar"/>
+	<classpathentry kind="lib" path="libs/okio-1.9.0.jar"/>
+	<classpathentry kind="lib" path="libs/Pixelmon-1.12.2-7.0.5-server.jar"/>
+	<classpathentry kind="lib" path="libs/PlaceholderAPI-2.9.2.jar"/>
+	<classpathentry kind="lib" path="libs/Spigot-1.12-596221b_d00c057-20170726-0522.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:/E:/下载/bukkit-1.12.2-javadoc-chinese.jar!/"/>
+		</attributes>
+	</classpathentry>
+	<classpathentry kind="lib" path="libs/Vault.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

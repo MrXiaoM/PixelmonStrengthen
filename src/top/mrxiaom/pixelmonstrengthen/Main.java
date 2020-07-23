@@ -166,7 +166,7 @@ public class Main extends JavaPlugin implements Listener {
 		NBTTagCompound compound = nmsitem.hasTag() ? nmsitem.getTag() : new NBTTagCompound();
 		compound.set("SpriteName", new NBTTagString(path));
 		nmsitem.setTag(compound);
-
+		
 		item_pokemon = CraftItemStack.asBukkitCopy(nmsitem);
 		return item_pokemon;
 	}
@@ -421,7 +421,7 @@ public class Main extends JavaPlugin implements Listener {
 			im.setDisplayName(
 					pokemon == null ? this.getMessage("no-pokemon-item") : ("§e§l" +(pokemon.getNickname() == null ? pokemon.getDisplayName()
 							: pokemon.getNickname())+" §e§l("+ getPixelmonI18nName(pokemon) +")"));
-
+			
 			if (pokemon != null) {
 
 				int v = getV(pokemon);
@@ -435,7 +435,7 @@ public class Main extends JavaPlugin implements Listener {
 				for (String s : this.getConfig().getStringList("decompose-lore")) {
 					lores.add(s.replace("&", "§").replace("%amount%", "" + amount).replace("%per%", "" + per));
 				}
-				item.setAmount(v);
+				item.setAmount(v==0?1:v);
 				im.setLore(lores);
 			}
 			item.setItemMeta(im);
@@ -718,8 +718,14 @@ public class Main extends JavaPlugin implements Listener {
 				lore.add("  §a§l" + this.getMessage("soul-type-5") + ": "
 						+ pokemon.getIVs().get(StatsType.SpecialDefence));
 				lore.add("  §a§l" + this.getMessage("soul-type-6") + ": " + pokemon.getIVs().get(StatsType.Speed));
-				inv.setItem(10, PUBLIC_VALUE.getItem(Material.ITEM_FRAME, (v == 0 ? 1 : v), 0,
-						"§a§l" + v + "v §e§l" + pokemon.getDisplayName(), lore));
+				ItemStack itemPokemon = inv.getItem(10);
+				ItemMeta imPokemon = itemPokemon.getItemMeta();
+				imPokemon.setDisplayName("§a§l" + v + "v §e§l" + pokemon.getDisplayName());
+				imPokemon.setLore(lore);
+				itemPokemon.setAmount((v == 0 ? 1 : v));
+				itemPokemon.setItemMeta(imPokemon);
+				inv.setItem(10, itemPokemon);
+				
 			}
 		}
 		/////////////// 分解 ///////////////
@@ -753,7 +759,7 @@ public class Main extends JavaPlugin implements Listener {
 		}
 		
 		/////////////// 分解确认 ///////////////
-		if (event.getInventory().getTitle().equalsIgnoreCase(PUBLIC_VALUE.fenjie_title)) {
+		if (event.getInventory().getTitle().equalsIgnoreCase(PUBLIC_VALUE.fenjie_confirm_title)) {
 			event.setCancelled(true);
 			p.updateInventory();
 			if (event.getRawSlot() == 16) {
