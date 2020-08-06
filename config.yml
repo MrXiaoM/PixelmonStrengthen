@@ -25,8 +25,6 @@ tips-lore:
   - "&b请务必算好增加的个体值，如果超过了31，"
   - "&b个体会被设置为31并取走灵魂碎片"
   - "&b即使那项个体已经到达了31也一样"
-  - ""
-  - "&d&l本功能为圣灵服务器原创功能"
 
 # GUI-开始强化按钮的标题
 start-name: '&a开始强化'
@@ -65,6 +63,9 @@ message:
   soul-type-6: '速度'
   fail-1: ' &c 强化失败! 你放入的所有灵魂都消失了'
   fail-2: ' &c 强化失败! 灵魂不正确、未放置灵魂或个体超过上限'
+  fail-3: ' &c 强化失败! 你没有权限将个体值升到 %v%V 以上'
+  fail-3-1: ' &c 强化失败! 你无法将精灵的个体总值升到比 %v% 要更高'
+  fail-4: ' &c 分解失败! 你没有权限分解个体值小于 %v%V 的精灵'
   success-1: '&a 强化成功! 个体值情况如下: \n&b%situation%'
   success-2: '&a 分解完成! 你获得了 %amount% 个 %pokemon_displayname% 灵魂'
   last-pokemon: '&e 再分解你就没精灵了 QAQ'
@@ -72,6 +73,8 @@ message:
   reloaded: '&a 配置已重载'
   reloaded-player: '&a 配置已重载，关闭强化/分解界面'
   no-permission: '&c 你没有权限'
+  no-money: '&c 你的金币不足，需要 %money% 金币'
+  no-points: '&c 你的点券不足，需要 %points% 点券'
 
 strengthen-title: '&3&l精灵强化'
 decompose-title: '&c&l请选择你要分解的精灵 [操作不可逆!]'
@@ -85,6 +88,12 @@ allow-egg: false
 probability_default: 50.0
 # 特殊精灵强化成功几率 (百分比，填 100.0 即 100.0%)
 probability_special: 100.0
+# 最高可强化到多少个体总值 (最大值: 186)
+max-ivs: 186
+# 强化需要金币 (别加小数点那么吝啬，反正我也不给加)
+strengthen-need-money: 0
+# 强化需要点券
+strengthen-need-points: 0
 # 分解精灵时分解出的碎片数量
 amount: 2
 # 每个碎片能增加的个体值
