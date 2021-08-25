@@ -11,8 +11,8 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="libs/Vault.jar"/>
-	<classpathentry kind="lib" path="E:/下载/Pixelmon-1.12.2-8.0.2-server.jar"/>
-	<classpathentry kind="lib" path="D:/.gradle/caches/minecraft/net/minecraftforge/forge/1.12.1-14.22.1.2478/snapshot/20170624/forge-1.12.1-14.22.1.2478-srgBin.jar"/>
-	<classpathentry kind="lib" path="E:/下载/programs/PlayerPoints.jar"/>
+	<classpathentry kind="lib" path="libs/forge-1.12.2-14.23.1.2555-srgBin.jar"/>
+	<classpathentry kind="lib" path="D:/日食项目/libraries/PlayerPoints.jar"/>
+	<classpathentry kind="lib" path="D:/下载/Pixelmon-1.12.2-8.2.0-server.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -1,0 +1,10 @@
+name: PixelmonStrengthen
+main: top.mrxiaom.pixelmonstrengthen.Main
+version: 1.0.4
+author: MrXiaoM
+softdepends: ["Vault", "PlayerPoints"]
+commands:
+   pixelmonstrengthen:
+      usage: /pixelmonstrengthen help
+   ps:
+      usage: /ps help

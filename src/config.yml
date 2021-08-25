@@ -1,0 +1,187 @@
+#####################
+# PixelmonStrengthen
+# 配置文件
+# 作者QQ: 2431208142
+#####################
+
+# 灵魂碎片物品ID
+soul-item-id: 348
+# 灵魂碎片物品lore
+soul-item-lore:
+  - '&a从 %pokemon_displayname% 体内提取出的灵魂精华'
+  - '&b可用于强化同类精灵，单个灵魂可强化的点数: &e&l%per%'
+  
+# GUI-提示信息的标题
+tips-name: '&e提示'
+# GUI-提示消息的lore
+tips-lore:
+  - '&b请在指定紫色玻璃板的下面放置精灵灵魂'
+  - '&b精灵灵魂将用于强化个体值，使用后消耗'
+  - '&c不同精灵使用灵魂强化的个体值数量不同'
+  - '&c详细查看精灵灵魂的描述'
+  - '&a只提升1点个体的灵魂有50%几率可以强化成功'
+  - '&a若失败了，放进去的灵魂直接消失…'
+  - '&a为避免全部白给，建议一个一个来'
+  - '&b请务必算好增加的个体值，如果超过了31，'
+  - '&b个体会被设置为31并取走灵魂碎片'
+  - '&b即使那项个体已经到达了31也一样'
+
+# GUI-开始强化按钮的标题
+start-name: '&a开始强化'
+# GUI-开始强化按钮的lore
+start-lore:
+  - '&b点击开始强化'
+  - '&c强化前请先看上面的提示!!'
+  
+decompose-lore:
+  - '§a§l点击将此精灵转换成精灵灵魂 *%amount%'
+  - '§a§l本精灵的灵魂单次强化可加 %per% 个体值'
+  - '§c§l此操作是不可逆的!! 请慎重操作!!'
+  - '§c§l此操作是不可逆的!! 请慎重操作!!'
+  - '§c§l此操作是不可逆的!! 请慎重操作!!'
+decompose-confirm-buttonname: '&a&l确定分解'
+decompose-confirm-lore:
+  - '&e点击此处确认分解此精灵'
+  - '§c§l此操作是不可逆的!! 请慎重操作!!'
+  - '§c§l此操作是不可逆的!! 请慎重操作!!'
+  - '§c§l此操作是不可逆的!! 请慎重操作!!'
+# 消息
+message:
+  no-team: '&e 出现了点问题，你的队伍为空'
+  no-number: '&e 数字必须为1-6之间的整数!'
+  no-pokemon: '&e 这格没有精灵哦'
+  no-pokemon-item: '&c&l这格没有精灵'
+  unknown-slot: '&e 挺秃然的，系统获取不到这个精灵在第几格'
+  not-allow-egg: '&e 事实上… 我不允许你强化一个蛋'
+  player-only: '&c 这个指令只能玩家执行'
+  soul-disappear: ' &b&l你在“%type%&b&l”格子的灵魂消失了'
+  soul-type-1: '生命'
+  soul-type-2: '攻击'
+  soul-type-3: '防御'
+  soul-type-4: '特攻'
+  soul-type-5: '特防'
+  soul-type-6: '速度'
+  fail-1: ' &c 强化失败! 你放入的所有灵魂都消失了'
+  fail-2: ' &c 强化失败! 灵魂不正确、未放置灵魂或个体超过上限'
+  fail-3: ' &c 强化失败! 你没有权限将个体值升到 %v%V 以上'
+  fail-3-1: ' &c 强化失败! 你无法将精灵的个体总值升到比 %v% 要更高'
+  fail-4: ' &c 分解失败! 你没有权限分解个体值小于 %v%V 的精灵'
+  success-1: '&a 强化成功! 个体值情况如下: \n&b%situation%'
+  success-2: '&a 分解完成! 你获得了 %amount% 个 %pokemon_displayname% 灵魂'
+  last-pokemon: '&e 再分解你就没精灵了 QAQ'
+  frame-title: '&f&l*'
+  reloaded: '&a 配置已重载'
+  reloaded-player: '&a 配置已重载，关闭强化/分解界面'
+  no-permission: '&c 你没有权限'
+  no-money: '&c 你的金币不足，需要 %money% 金币'
+  no-points: '&c 你的点券不足，需要 %points% 点券'
+  # 1.0.4 新增
+  can-not-fenjie: '&c 该精灵不能分解'
+  can-not-fenjie-gui: '&c这个精灵不能被分解'
+
+strengthen-title: '&3&l精灵强化'
+decompose-title: '&c&l请选择你要分解的精灵 [操作不可逆!]'
+decompose-confirm-title: '&c&l你确定要分解这个精灵吗?'
+
+# 消息前缀
+prefix: '&7[&6精灵强化&7]'
+# 是否允许强化一个蛋
+allow-egg: false
+# 强化成功几率 (百分比，填 50.0 即 50.0%)
+probability_default: 50.0
+# 特殊精灵强化成功几率 (百分比，填 100.0 即 100.0%)
+probability_special: 100.0
+# 最高可强化到多少个体总值 (最大值: 186)
+max-ivs: 186
+# 强化需要金币 (别加小数点那么吝啬，反正我也不给加)
+strengthen-need-money: 0
+# 强化需要点券
+strengthen-need-points: 0
+# 分解精灵时分解出的碎片数量
+amount: 2
+# 每个碎片能增加的个体值
+default: 1
+# 特殊精灵列表和特殊精灵每个碎片能增加的个体值
+# 默认列表已添加所有神兽
+special:
+  ditto: 5
+  Articuno: 5
+  Zapdos: 5
+  Moltres: 5
+  Mewtwo: 5
+  Mew: 5
+  Raikou: 5
+  Entei: 5
+  Suicune: 5
+  Lugia: 5
+  Ho-Oh: 5
+  Celebi: 5
+  Regirock: 5
+  Regice: 5
+  Registeel: 5
+  Latias: 5
+  Latios: 5
+  Kyogre: 5
+  Groudon: 5
+  Rayquaza: 5
+  Jirachi: 5
+  Deoxys: 5
+  Uxie: 5
+  Mesprit: 5
+  Azelf: 5
+  Heatran: 5
+  Regigigas: 5
+  Cresselia: 5
+  Dialga: 5
+  Palkia: 5
+  Giratina: 5
+  Phione: 5
+  Manaphy: 5
+  Darkrai: 5
+  Shaymin: 5
+  Arceus: 5
+  Cobalion: 5
+  Terrakion: 5
+  Virizion: 5
+  Tornadus: 5
+  Thundurus: 5
+  Landorus: 5
+  Reshiram: 5
+  Zekrom: 5
+  Kyurem: 5
+  Victini: 5
+  Keldeo: 5
+  Meloetta: 5
+  Genesect: 5
+  Xerneas: 5
+  Yveltal: 5
+  Zygarde: 5
+  Diancie: 5
+  Hoopa: 5
+  Volcanion: 5
+  Silvally: 5
+  Tapu Koko: 5
+  Tapu Lele: 5
+  Tapu Bulu: 5
+  Tapu Fini: 5
+  Cosmog: 5
+  Cosmoem: 5
+  Solgaleo: 5
+  Lunala: 5
+  Necrozma: 5
+  Magearna: 5
+  Marshadow: 5
+  Zeraora: 5
+  Meltan: 5
+  Melmetal: 5
+  Buzzwole: 5
+  Pheromosa: 5
+  Xurkitree: 5
+  Celesteela: 5
+  Kartana: 5
+  Guzzlord: 5
+  Poipole: 5
+  Naganadel: 5
+  Stakataka: 5
+  Blacephalon: 5
+  Nihilego: 5
