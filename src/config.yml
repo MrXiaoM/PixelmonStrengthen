@@ -160,10 +160,10 @@ special:
   Hoopa: 5
   Volcanion: 5
   Silvally: 5
-  Tapu Koko: 5
-  Tapu Lele: 5
-  Tapu Bulu: 5
-  Tapu Fini: 5
+  TapuKoko: 5
+  TapuLele: 5
+  TapuBulu: 5
+  TapuFini: 5
   Cosmog: 5
   Cosmoem: 5
   Solgaleo: 5
@@ -185,3 +185,15 @@ special:
   Stakataka: 5
   Blacephalon: 5
   Nihilego: 5
+  Zacian: 5
+  Zamazenta: 5
+  Eternatus: 5
+  Kubfu: 5
+  Urshifu: 5
+  Zarude: 5
+  Regieleki: 5
+  Glastrier: 5
+  Spectrier: 5
+  Calyrex: 5
+  Regidrago: 5
+  TypeNull: 5

@@ -65,6 +65,7 @@ public class Main extends JavaPlugin implements Listener {
 		this.guiQiangHua = new GuiQiangHua(this);
 		this.guiFenJie = new GuiFenJie(this);
 		this.guiFenJieConfirm = new GuiFenJieConfirm(this);
+		
 	}
 	
 	public GuiQiangHua getGuiQiangHua() {

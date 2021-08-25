@@ -47,6 +47,7 @@ public class GuiFenJieConfirm implements GuiModel{
 		int amount = main.getConfig().getInt("amount");
 		int per = main.getSoulIvs(pokemon.getBaseStats().getPokemonName());
 		List<String> lore = new ArrayList<String>();
+		
 		lore.add("" + intValue);
 		lore.add("§7===[§b个体值§7]===");
 		lore.add("  §a§l" + main.getMessage("soul-type-1") + ": " + pokemon.getIVs().getStat(StatsType.HP));
@@ -55,8 +56,8 @@ public class GuiFenJieConfirm implements GuiModel{
 		lore.add("  §a§l" + main.getMessage("soul-type-4") + ": " + pokemon.getIVs().getStat(StatsType.SpecialAttack));
 		lore.add("  §a§l" + main.getMessage("soul-type-5") + ": " + pokemon.getIVs().getStat(StatsType.SpecialDefence));
 		lore.add("  §a§l" + main.getMessage("soul-type-6") + ": " + pokemon.getIVs().getStat(StatsType.Speed));
-		lore.add("§e&§分解将获得 " + pokemon_displayname + " 灵魂 *" +amount);
-		lore.add("§e每个碎片可增加 " + per+" 点个体值");
+		lore.add("§e分解将获得 §a" + pokemon_displayname + " §e灵魂 *" +amount);
+		lore.add("§e每个碎片可增加 §a" + per+" §e点个体值");
 		
 		ItemStack item_pokemon = Utils.getPixelmonItem(pokemon);
 		ItemMeta im = item_pokemon.getItemMeta();
