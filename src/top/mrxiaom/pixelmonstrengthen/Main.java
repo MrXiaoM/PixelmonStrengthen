@@ -173,6 +173,7 @@ public class Main extends JavaPlugin implements Listener {
 				if (args[0].equalsIgnoreCase("qianghua")) {
 					if(!p.hasPermission("pixelmonstrengthen.qianghua")) {
 						p.sendMessage(prefix + this.getMessage("no-permission"));
+						return true;
 					}
 					if (args.length == 2) {
 						PlayerPartyStorage pStorage = Pixelmon.storageManager.getParty(p.getUniqueId());
@@ -204,6 +205,7 @@ public class Main extends JavaPlugin implements Listener {
 
 					if(!p.hasPermission("pixelmonstrengthen.fenjie")) {
 						p.sendMessage(prefix + this.getMessage("no-permission"));
+						return true;
 					}
 					PlayerPartyStorage pStorage = Pixelmon.storageManager.getParty(p.getUniqueId());
 					if (pStorage == null) {
@@ -219,6 +221,7 @@ public class Main extends JavaPlugin implements Listener {
 
 					if(!p.hasPermission("pixelmonstrengthen.reload")) {
 						p.sendMessage(prefix + this.getMessage("no-permission"));
+						return true;
 					}
 					this.saveDefaultConfig();
 					this.reloadConfig();
