@@ -1,0 +1,358 @@
+# PixelmonStrength 2.0
+
+# 语言文件位置
+lang-file: 'zh-cn.yml'
+
+# 考虑到某些服主不调中文的因素，
+# 可以在这里切换本插件显示的宝可梦mod语言文件
+# 如果Mod更新了需要更换语言文件，在宝可梦mod里将文件/assets/pixelmon/lang/zh_CN.lang替换过插件目录里的就完事了
+pixelmon-lang: 'zh_CN.lang'
+
+# 灵魂碎片设置
+# 在确定之后不要随意更改
+soul:
+  # 物品ID，可用数字ID也可用英文ID
+  material: glowstone_dust
+  # 物品描述
+  name: '&e&l%pokemon_name% 的灵魂'
+  lore:
+    - '&a从 %pokemon_name% 体内提取出的灵魂精华'
+    - '&a可用于强化同类精灵，单个灵魂可强化的点数: &e&l%pokemon_soul_per_ivs%'
+  # 附魔，格式为 附魔ID:等级
+  # 附魔ID列表 https://helpch.at/docs/1.12.2/org/bukkit/enchantments/Enchantment.html
+  enchants:
+    - 'DURABILITY:1'
+  # 物品额外标识
+  # HIDE_ATTRIBUTES(隐藏属性描述), HIDE_DESTROYS(隐藏可破坏的方块描述),
+  # HIDE_ENCHANTS(隐藏附魔描述), HIDE_PLACED_ON(隐藏可放置在什么方块上描述),
+  # HIDE_POTION_EFFECTS(隐藏药水效果描述), HIDE_UNBREAKABLE(隐藏无法破坏描述)
+  flags:
+    - HIDE_ENCHANTS
+
+# 开启此项，在强化完毕发给玩家结果之前执行命令
+# 关闭此项，在强化完毕发给玩家结果之后执行命令
+execute-before-message: true
+# 强化成功后执行的命令
+# 详细编写规则请见发布帖
+strength-success-commands:
+  - 'console:alert %player_name% 强化 %pokemon_display% 成功! '
+# 强化完全失败后执行的命令
+totally-fail-commands: []
+# 强化成功后移除所有灵魂，不管它们有没有向本次强化有效地提供个体值
+remove-all-souls: false
+# 是否允许强化或分解一个蛋
+is-allow-egg: false
+# 禁用精灵强化的模式，用法详见插件发布帖
+# BLACKLIST - 黑名单
+# WHITELIST - 白名单
+ban-mode: BLACKLIST
+# 强化精灵设置 (几率100.0代表100%)
+pokemons:
+  # 默认
+  default:
+    # 几率
+    rate: 50.0
+    # 是否单独判定几率
+    # 如果开启，每个碎片都会计算一次几率，一种类型的格子中放入N个碎片不一定每个碎片都失败
+    single-rate: false
+    # 每个碎片可加多少个体
+    ivs: 1
+    # 最大个体值
+    max-ivs: 186
+    # 最多可以强化到多少V，-1代表不限制
+    max-v: 3
+    # 禁止强化的个体类型，下面的HP是例子，去掉#和[]就是正确的实例
+    # HP:生命, Attack:攻击, SpecialAttack:特攻, Defence:防御, SpecialDefence:特防, Speed:速度
+    banned-strengh: []
+    #- 'HP'
+
+    # 强化一次所需金钱
+    use-money: 100
+    # 是否单独计算金钱，即总金钱 = 数量 * 强化一次单价
+    single-money: false
+    # 强化一次所需的PlayerPoints点券
+    use-points: 0
+    # 是否单独计算点券，即总点券 = 数量 * 强化一次单价
+    single-points: false
+  # 下面这个列表几乎包括所有神兽，如有需要自行修改
+  # 几率设置为0代表无法强化
+  # 像 max-ivs 之类下面列表没有的值，会取默认里的值，如需特殊值请自行添加
+  ditto:
+    rate: 100.0
+    ivs: 5
+  Articuno:
+    rate: 100.0
+    ivs: 5
+  Zapdos:
+    rate: 100.0
+    ivs: 5
+  Moltres:
+    rate: 100.0
+    ivs: 5
+  Mewtwo:
+    rate: 100.0
+    ivs: 5
+  Mew:
+    rate: 100.0
+    ivs: 5
+  Raikou:
+    rate: 100.0
+    ivs: 5
+  Entei:
+    rate: 100.0
+    ivs: 5
+  Suicune:
+    rate: 100.0
+    ivs: 5
+  Lugia:
+    rate: 100.0
+    ivs: 5
+  Ho-Oh:
+    rate: 100.0
+    ivs: 5
+  Celebi:
+    rate: 100.0
+    ivs: 5
+  Regirock:
+    rate: 100.0
+    ivs: 5
+  Regice:
+    rate: 100.0
+    ivs: 5
+  Registeel:
+    rate: 100.0
+    ivs: 5
+  Latias:
+    rate: 100.0
+    ivs: 5
+  Latios:
+    rate: 100.0
+    ivs: 5
+  Kyogre:
+    rate: 100.0
+    ivs: 5
+  Groudon:
+    rate: 100.0
+    ivs: 5
+  Rayquaza:
+    rate: 100.0
+    ivs: 5
+  Jirachi:
+    rate: 100.0
+    ivs: 5
+  Deoxys:
+    rate: 100.0
+    ivs: 5
+  Uxie:
+    rate: 100.0
+    ivs: 5
+  Mesprit:
+    rate: 100.0
+    ivs: 5
+  Azelf:
+    rate: 100.0
+    ivs: 5
+  Heatran:
+    rate: 100.0
+    ivs: 5
+  Regigigas:
+    rate: 100.0
+    ivs: 5
+  Cresselia:
+    rate: 100.0
+    ivs: 5
+  Dialga:
+    rate: 100.0
+    ivs: 5
+  Palkia:
+    rate: 100.0
+    ivs: 5
+  Giratina:
+    rate: 100.0
+    ivs: 5
+  Phione:
+    rate: 100.0
+    ivs: 5
+  Manaphy:
+    rate: 100.0
+    ivs: 5
+  Darkrai:
+    rate: 100.0
+    ivs: 5
+  Shaymin:
+    rate: 100.0
+    ivs: 5
+  Arceus:
+    rate: 100.0
+    ivs: 5
+  Cobalion:
+    rate: 100.0
+    ivs: 5
+  Terrakion:
+    rate: 100.0
+    ivs: 5
+  Virizion:
+    rate: 100.0
+    ivs: 5
+  Tornadus:
+    rate: 100.0
+    ivs: 5
+  Thundurus:
+    rate: 100.0
+    ivs: 5
+  Landorus:
+    rate: 100.0
+    ivs: 5
+  Reshiram:
+    rate: 100.0
+    ivs: 5
+  Zekrom:
+    rate: 100.0
+    ivs: 5
+  Kyurem:
+    rate: 100.0
+    ivs: 5
+  Victini:
+    rate: 100.0
+    ivs: 5
+  Keldeo:
+    rate: 100.0
+    ivs: 5
+  Meloetta:
+    rate: 100.0
+    ivs: 5
+  Genesect:
+    rate: 100.0
+    ivs: 5
+  Xerneas:
+    rate: 100.0
+    ivs: 5
+  Yveltal:
+    rate: 100.0
+    ivs: 5
+  Zygarde:
+    rate: 100.0
+    ivs: 5
+  Diancie:
+    rate: 100.0
+    ivs: 5
+  Hoopa:
+    rate: 100.0
+    ivs: 5
+  Volcanion:
+    rate: 100.0
+    ivs: 5
+  Silvally:
+    rate: 100.0
+    ivs: 5
+  TapuKoko:
+    rate: 100.0
+    ivs: 5
+  TapuLele:
+    rate: 100.0
+    ivs: 5
+  TapuBulu:
+    rate: 100.0
+    ivs: 5
+  TapuFini:
+    rate: 100.0
+    ivs: 5
+  Cosmog:
+    rate: 100.0
+    ivs: 5
+  Cosmoem:
+    rate: 100.0
+    ivs: 5
+  Solgaleo:
+    rate: 100.0
+    ivs: 5
+  Lunala:
+    rate: 100.0
+    ivs: 5
+  Necrozma:
+    rate: 100.0
+    ivs: 5
+  Magearna:
+    rate: 100.0
+    ivs: 5
+  Marshadow:
+    rate: 100.0
+    ivs: 5
+  Zeraora:
+    rate: 100.0
+    ivs: 5
+  Meltan:
+    rate: 100.0
+    ivs: 5
+  Melmetal:
+    rate: 100.0
+    ivs: 5
+  Buzzwole:
+    rate: 100.0
+    ivs: 5
+  Pheromosa:
+    rate: 100.0
+    ivs: 5
+  Xurkitree:
+    rate: 100.0
+    ivs: 5
+  Celesteela:
+    rate: 100.0
+    ivs: 5
+  Kartana:
+    rate: 100.0
+    ivs: 5
+  Guzzlord:
+    rate: 100.0
+    ivs: 5
+  Poipole:
+    rate: 100.0
+    ivs: 5
+  Naganadel:
+    rate: 100.0
+    ivs: 5
+  Stakataka:
+    rate: 100.0
+    ivs: 5
+  Blacephalon:
+    rate: 100.0
+    ivs: 5
+  Nihilego:
+    rate: 100.0
+    ivs: 5
+  Zacian:
+    rate: 100.0
+    ivs: 5
+  Zamazenta:
+    rate: 100.0
+    ivs: 5
+  Eternatus:
+    rate: 100.0
+    ivs: 5
+  Kubfu:
+    rate: 100.0
+    ivs: 5
+  Urshifu:
+    rate: 100.0
+    ivs: 5
+  Zarude:
+    rate: 100.0
+    ivs: 5
+  Regieleki:
+    rate: 100.0
+    ivs: 5
+  Glastrier:
+    rate: 100.0
+    ivs: 5
+  Spectrier:
+    rate: 100.0
+    ivs: 5
+  Calyrex:
+    rate: 100.0
+    ivs: 5
+  Regidrago:
+    rate: 100.0
+    ivs: 5
+  TypeNull:
+    rate: 100.0
+    ivs: 5

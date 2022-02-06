@@ -1,0 +1,13 @@
+name: PixelmonStrengthen
+version: '${version}'
+main: top.mrxiaom.pixelmonstrengthen.PixelmonStrengthen
+depend: [ Vault ]
+softdepend:
+  - PlaceholderAPI
+  - PlayerPoints
+authors: [ MrXiaoM ]
+commands:
+  pixelmonstrengthen:
+    description: Main command.
+    aliases:
+      - ps
