@@ -29,18 +29,20 @@ public class Config {
         public int ivs;
         public int maxIvs;
         public int maxV;
+        public int amount;
         public List<IModSupport.IvsEvsStats> bannedStrength;
         public int useMoney;
         public boolean isSingleMoney;
         public int usePoints;
         public boolean isSinglePoints;
 
-        public PokemonSettings(double rate, boolean isSingleRate, int ivs, int maxIvs, int maxV, List<IModSupport.IvsEvsStats> bannedStrength, int useMoney, boolean isSingleMoney, int usePoints, boolean isSinglePoints) {
+        public PokemonSettings(double rate, boolean isSingleRate, int ivs, int maxIvs, int maxV, int amount, List<IModSupport.IvsEvsStats> bannedStrength, int useMoney, boolean isSingleMoney, int usePoints, boolean isSinglePoints) {
             this.rate = rate;
             this.isSingleRate = isSingleRate;
             this.ivs = ivs;
             this.maxIvs = maxIvs;
             this.maxV = maxV;
+            this.amount = amount;
             this.bannedStrength = bannedStrength;
             this.useMoney = useMoney;
             this.isSingleMoney = isSingleMoney;
@@ -56,6 +58,7 @@ public class Config {
     boolean isRemoveAllSouls;
     boolean isAllowEgg;
     boolean isExecuteBeforeMessage;
+    int updatePeriod;
     BanMode banMode;
     List<String> strengthSuccessCommands;
     List<String> totallyFailCommands;
@@ -74,6 +77,7 @@ public class Config {
         int ivs = config.getInt("pokemons." + baseName + ".ivs", config.getInt("pokemons.default.ivs", 1));
         int maxIvs = config.getInt("pokemons." + baseName + ".max-ivs", config.getInt("pokemons.default.max-ivs", 186));
         int maxV = config.getInt("pokemons." + baseName + ".max-v", config.getInt("pokemons.default.max-v", 3));
+        int amount = config.getInt("pokemons." + baseName + ".amount", config.getInt("pokemons.default.amount", 2));
         int useMoney = config.getInt("pokemons." + baseName + ".use-money", config.getInt("pokemons.default.use-money", 100));
         boolean isSingleMoney = config.getBoolean("pokemons." + baseName + ".single-money", config.getBoolean("pokemons.default.single-money", false));
         int usePoints = config.getInt("pokemons." + baseName + ".use-points", config.getInt("pokemons.default.use-points", 0));
@@ -85,7 +89,7 @@ public class Config {
             Optional<IModSupport.IvsEvsStats> stats = Util.valueOf(IModSupport.IvsEvsStats.class, s);
             stats.ifPresent(bannedStrength::add);
         }
-        return new PokemonSettings(rate, isSingleRate, ivs, maxIvs, maxV, bannedStrength, useMoney, isSingleMoney, usePoints, isSinglePoints);
+        return new PokemonSettings(rate, isSingleRate, ivs, maxIvs, maxV, amount, bannedStrength, useMoney, isSingleMoney, usePoints, isSinglePoints);
     }
 
     public Config reloadConfig() {
@@ -107,8 +111,9 @@ public class Config {
         }
         Lang.loadLanguage(plugin);
         isAllowEgg = config.getBoolean("is-allow-egg", false);
-        isRemoveAllSouls = config.getBoolean("remove-all-soul", false);
+        isRemoveAllSouls = config.getBoolean("remove-all-souls", false);
         isExecuteBeforeMessage = config.getBoolean("execute-before-message", true);
+        updatePeriod = config.getInt("update-period", 5);
         banMode = Util.valueOf(BanMode.class, config.getString("ban-mode", "BLACKLIST")).orElse(BanMode.BLACKLIST);
         strengthSuccessCommands = config.getStringList("strength-success-commands");
         totallyFailCommands = config.getStringList("totally-fail-commands");
@@ -118,14 +123,14 @@ public class Config {
     public ItemStack getPokemonSoul(Player player, Pokemon pokemon) {
         PokemonSettings settings = getPokemonSettings(pokemon);
         String baseName = plugin.getModSupport().getPokemonBaseName(pokemon);
-        return getPokemonSoul(player, baseName, settings.ivs);
+        return getPokemonSoul(player, baseName, settings.ivs, settings.amount);
     }
 
-    public ItemStack getPokemonSoul(Player player, String baseName, int perIvs) {
-        return getPokemonSoul(player, baseName, Lang.getPokemonTranslateName(baseName), perIvs);
+    public ItemStack getPokemonSoul(Player player, String baseName, int perIvs, int amount) {
+        return getPokemonSoul(player, baseName, Lang.getPokemonTranslateName(baseName), perIvs, amount);
     }
 
-    public ItemStack getPokemonSoul(Player player, String baseName, String name, int perIvs) {
+    public ItemStack getPokemonSoul(Player player, String baseName, String name, int perIvs, int amount) {
         List<Pair<String, String>> replaceList = Lists.newArrayList(
                 Pair.of("%pokemon_name%", name),
                 Pair.of("%pokemon_basename%", baseName),
@@ -133,7 +138,7 @@ public class Config {
         );
         Object material = config.get("soul.material");
         int data = config.getInt("soul.data", 0);
-        String display = config.getString("soul.display");
+        String display = config.getString("soul.name");
         for (Pair<String, String> pair : replaceList) {
             display = display.replace(pair.getKey(), pair.getValue());
         }
@@ -146,12 +151,13 @@ public class Config {
         } else {
             Material m = Material.STONE;
             try {
-                m = Material.valueOf(material.toString());
+                m = Material.valueOf(material.toString().toUpperCase());
             } catch (Throwable ignored) {
                 PixelmonStrengthen.getInstance().getLogger().warning("物品ID " + material.toString() + " 无效");
             }
             item = ItemStackUtil.build(player, m, data, 1, display, lore, replaceList);
         }
+        item.setAmount(Math.max(1, Math.min(amount, 64)));
         for (String s : config.getStringList("soul.enchants")) {
             if (s.contains(":")) {
                 Optional<Enchantment> ench = ItemStackUtil.getEnchantment(s.substring(0, s.indexOf(":")));
@@ -192,6 +198,10 @@ public class Config {
 
     public boolean isExecuteBeforeMessage() {
         return isExecuteBeforeMessage;
+    }
+
+    public int getUpdatePeriod() {
+        return updatePeriod;
     }
 
     public BanMode getBanMode() {

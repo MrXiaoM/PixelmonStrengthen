@@ -122,7 +122,7 @@ public class Lang {
     public static ItemStack getItem(String root, Player player, List<Pair<String, String>> replaceList) {
         Object material = config.get(root + ".material");
         int data = config.getInt(root + ".data", 0);
-        String display = config.getString(root + ".display");
+        String display = config.getString(root + ".name");
         List<String> lore = config.getStringList(root + ".lore");
         if (material instanceof Integer) {
             int id = (Integer) material;
@@ -130,7 +130,7 @@ public class Lang {
         } else {
             Material m = Material.STONE;
             try {
-                m = Material.valueOf(material.toString());
+                m = Material.valueOf(material.toString().toUpperCase());
             } catch (Throwable ignored) {
                 PixelmonStrengthen.getInstance().getLogger().warning("物品ID " + material.toString() + " 无效");
             }
@@ -141,7 +141,8 @@ public class Lang {
     public static List<Pair<String, String>> getPokemonLoreReplaceList(Pokemon pokemon) {
         IModSupport mod = PixelmonStrengthen.getInstance().getModSupport();
         return Lists.newArrayList(
-                Pair.of("%pokemon_display%", pokemon.getDisplayName()),
+                Pair.of("%v%", String.valueOf(mod.getV(pokemon))),
+                Pair.of("%pokemon_display%", pokemon.getNickname() != null ? pokemon.getNickname() : Lang.getPokemonTranslateName(pokemon)),
                 Pair.of("%pokemon_name%", Lang.getPokemonTranslateName(pokemon)),
                 Pair.of("%ivs_hp%", String.valueOf(mod.getIvs(pokemon, IModSupport.IvsEvsStats.HP))),
                 Pair.of("%ivs_attack%", String.valueOf(mod.getIvs(pokemon, IModSupport.IvsEvsStats.Attack))),

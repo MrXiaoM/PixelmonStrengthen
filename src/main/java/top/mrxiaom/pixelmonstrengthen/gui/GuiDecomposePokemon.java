@@ -28,7 +28,7 @@ public class GuiDecomposePokemon implements IGui {
 
     @Override
     public Inventory create() {
-        Inventory inv = Bukkit.createInventory(null, 36, Lang.get("gui.decompose.title"));
+        Inventory inv = Bukkit.createInventory(null, 27, Lang.get("gui.decompose.title"));
         ItemStackUtil.setItemAroundInv(inv, Lang.getItem("gui.decompose.items.frame", player));
         IModSupport mod = PixelmonStrengthen.getInstance().getModSupport();
         PlayerPartyStorage party = mod.getPokemonParty(player.getUniqueId());

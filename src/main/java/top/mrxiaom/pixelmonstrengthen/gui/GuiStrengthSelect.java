@@ -46,7 +46,7 @@ public class GuiStrengthSelect implements IGui {
                 inv.setItem(10 + i, item);
             }
         }
-        inv.setItem(16, Lang.getItem("gui.strength-select-items.tips", player));
+        inv.setItem(16, Lang.getItem("gui.strength-select.items.tips", player));
         return inv;
     }
 

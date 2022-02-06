@@ -10,9 +10,12 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import top.mrxiaom.pixelmonstrengthen.Lang;
 import top.mrxiaom.pixelmonstrengthen.PixelmonStrengthen;
+import top.mrxiaom.pixelmonstrengthen.utils.Pair;
 import top.mrxiaom.pixelmonstrengthen.utils.pixelmonmod.IModSupport;
 import top.mrxiaom.pixelmonstrengthen.utils.ItemStackUtil;
 import top.mrxiaom.pixelmonstrengthen.utils.Util;
+
+import java.util.List;
 
 public class GuiDecomposePokemonConfirm implements IGui {
     Player player;
@@ -46,7 +49,9 @@ public class GuiDecomposePokemonConfirm implements IGui {
         }
         Inventory inv = Bukkit.createInventory(null, 27, Lang.get("gui.decompose-confirm.title"));
         ItemStackUtil.setItemAroundInv(inv, Lang.getItem("gui.decompose-confirm.items.frame", player));
-        inv.setItem(10, Lang.getItem("gui.decompose-confirm.items.pokemon", player, Lang.getPokemonLoreReplaceList(pokemon)));
+        List<Pair<String, String>> replaceList = Lang.getPokemonLoreReplaceList(pokemon);
+        replaceList.add(Pair.of("%amount%", String.valueOf(PixelmonStrengthen.getInstance().getPluginConfig().getPokemonSettings(pokemon).amount)));
+        inv.setItem(10, Lang.getItem("gui.decompose-confirm.items.pokemon", player, replaceList));
 
         inv.setItem(16, Lang.getItem("gui.decompose-confirm.items.confirm", player));
         return inv;
@@ -76,6 +81,7 @@ public class GuiDecomposePokemonConfirm implements IGui {
         // 确认分解
         if (event.getRawSlot() == 16) {
             ItemStack item = PixelmonStrengthen.getInstance().getPluginConfig().getPokemonSoul(player, pokemon);
+            party.set(slot, null);
             Util.giveItemsToPlayer(player, item);
             player.closeInventory();
         }

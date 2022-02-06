@@ -10,6 +10,7 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.scheduler.BukkitTask;
 import top.mrxiaom.pixelmonstrengthen.Config;
 import top.mrxiaom.pixelmonstrengthen.Lang;
 import top.mrxiaom.pixelmonstrengthen.OtherPlugin;
@@ -26,7 +27,7 @@ public class GuiStrength implements IGui {
     int slot;
     Inventory inventory;
     Pokemon pokemon;
-
+    BukkitTask updateTask;
     public GuiStrength(Player player, int slot) {
         this.player = player;
         this.slot = slot;
@@ -54,24 +55,27 @@ public class GuiStrength implements IGui {
             return null;
         }
         this.pokemon = pokemon;
-        Inventory inv = Bukkit.createInventory(null, 54, Lang.get("gui.strength.title"));
+        inventory = Bukkit.createInventory(null, 54, Lang.get("gui.strength.title"));
         ItemStack frame = Lang.getItem("gui.strength.items.frame", player);
-        ItemStackUtil.setItemAroundInv(inv, frame);
-        ItemStackUtil.setItemInLine(inv, frame, 5);
-        ItemStackUtil.setItemIn(inv, frame, 34);
-        inv.setItem(10, Lang.getItem("gui.strength.items.pokemon", player, Lang.getPokemonLoreReplaceList(pokemon)));
+        ItemStack frame1 = Lang.getItem("gui.strength.items.frame-1", player);
+        ItemStackUtil.setItemInLine(inventory, frame1, 2);
+        ItemStackUtil.setItemInLine(inventory, frame1, 5);
+        ItemStackUtil.setItemIn(inventory, frame1, 34);
+        ItemStackUtil.setItemAroundInv(inventory, frame);
+        inventory.setItem(10, Lang.getItem("gui.strength.items.pokemon", player, Lang.getPokemonLoreReplaceList(pokemon)));
 
-        inv.setItem(16, Lang.getItem("gui.strength.items.tips", player));
+        inventory.setItem(16, Lang.getItem("gui.strength.items.tips", player));
         updateStartButton();
 
-        inv.setItem(19, Lang.getItem("gui.strength.items.frame-ivs-hp", player));
-        inv.setItem(20, Lang.getItem("gui.strength.items.frame-ivs-attack", player));
-        inv.setItem(21, Lang.getItem("gui.strength.items.frame-ivs-defence", player));
-        inv.setItem(22, Lang.getItem("gui.strength.items.frame-ivs-specialattack", player));
-        inv.setItem(23, Lang.getItem("gui.strength.items.frame-ivs-specialdefence", player));
-        inv.setItem(24, Lang.getItem("gui.strength.items.frame-ivs-speed", player));
-        Bukkit.getScheduler().runTaskTimer(PixelmonStrengthen.getInstance(), this::updateStartButton, 10L, 10L);
-        return inventory = inv;
+        inventory.setItem(19, Lang.getItem("gui.strength.items.frame-ivs-hp", player));
+        inventory.setItem(20, Lang.getItem("gui.strength.items.frame-ivs-attack", player));
+        inventory.setItem(21, Lang.getItem("gui.strength.items.frame-ivs-defence", player));
+        inventory.setItem(22, Lang.getItem("gui.strength.items.frame-ivs-specialattack", player));
+        inventory.setItem(23, Lang.getItem("gui.strength.items.frame-ivs-specialdefence", player));
+        inventory.setItem(24, Lang.getItem("gui.strength.items.frame-ivs-speed", player));
+        int updatePeriod = PixelmonStrengthen.getInstance().getPluginConfig().getUpdatePeriod();
+        updateTask = Bukkit.getScheduler().runTaskTimer(PixelmonStrengthen.getInstance(), this::updateStartButton, updatePeriod, updatePeriod);
+        return inventory;
     }
 
 
@@ -110,6 +114,10 @@ public class GuiStrength implements IGui {
         if (slot < 28 || (slot > 33 && slot < 54)) {
             event.setCancelled(true);
         }
+        // 禁止 Shift 点击背包
+        if (slot >= 54 && event.isShiftClick()){
+            event.setCancelled(true);
+        }
         // 检查放置灵魂的格子
         if (slot >= 28 && slot <= 33) {
             ItemStack cursor = event.getCursor();
@@ -122,30 +130,46 @@ public class GuiStrength implements IGui {
         }
         // 开始强化
         if (slot == 25) {
+            int souls = 0;
+            for (int i = 0; i < 6; i++) {
+                ItemStack item = event.getInventory().getItem(28 + i);
+                if (PixelmonStrengthen.getInstance().checkSoul(item, pokemon).isPresent()) {
+                    souls += item.getAmount();
+                }
+            }
+            if(souls <= 0) {
+                player.sendMessage(Lang.get("errors.no-souls", true));
+                return;
+            }
             Config config = PixelmonStrengthen.getInstance().getPluginConfig();
-            Config.PokemonSettings settings = config.getPokemonSettings(pokemon);
             OtherPlugin api = PixelmonStrengthen.getInstance().getOtherPlugin();
             Map<IModSupport.IvsEvsStats, Integer> oldIvs = mod.getIvs(pokemon);
             // 计算结果
             FinalResult result = FinalResult.get(event.getInventory(), pokemon);
             // 算账
-            if (settings.useMoney > 0 && !api.hasMoney(player, result.finalMoney)) {
+            if (result.finalMoney > 0 && !api.hasMoney(player, result.finalMoney)) {
                 player.sendMessage(Lang.get("errors.no-money", true));
                 return;
             }
-            if (settings.usePoints > 0 && !api.hasPoints(player, result.finalPoints)) {
+            if (result.finalPoints > 0 && !api.hasPoints(player, result.finalPoints)) {
                 player.sendMessage(Lang.get("errors.no-points", true));
                 return;
             }
             // 扣钱
-            if (settings.useMoney > 0) {
-                api.takeMoney(player, settings.useMoney);
+            if (result.finalMoney > 0) {
+                api.takeMoney(player, result.finalMoney);
             }
-            if (settings.usePoints > 0) {
-                api.takePoints(player, settings.usePoints);
+            if (result.finalPoints > 0) {
+                api.takePoints(player, result.finalPoints);
             }
             for (int i : result.finalItems.keySet()) {
-                event.getInventory().setItem(i, result.finalItems.get(i));
+                ItemStack item = event.getInventory().getItem(i);
+                if (item != null){
+                    item.setAmount(result.finalItems.get(i));
+                    if(item.getAmount() > 0)
+                    event.getInventory().setItem(i, item);
+                    else event.getInventory().setItem(i, null);
+                }
             }
             // 应用结果到宝可梦
             boolean isSuccess = !result.finalIvsMap.isEmpty();
@@ -157,7 +181,7 @@ public class GuiStrength implements IGui {
             player.closeInventory();
             // 变量
             List<Pair<String, String>> replaceList = Lists.newArrayList(
-                    Pair.of("%pokemon_display%", pokemon.getDisplayName()),
+                    Pair.of("%pokemon_display%", pokemon.getNickname() != null ? pokemon.getNickname() : Lang.getPokemonTranslateName(pokemon)),
                     Pair.of("%pokemon_name%", Lang.getPokemonTranslateName(pokemon)),
                     Pair.of("%pokemon_basename%", mod.getPokemonBaseName(pokemon)),
                     Pair.of("%money%", String.valueOf(result.finalMoney)),
@@ -181,7 +205,7 @@ public class GuiStrength implements IGui {
                 replaceList.add(Pair.of("%pokemon_old_ivs_" + statName + "%", String.valueOf(oldValue)));
                 replaceList.add(Pair.of("%pokemon_new_ivs_" + statName + "%", String.valueOf(newValue)));
                 replaceList.add(Pair.of("%pokemon_changed_ivs_" + statName + "%", (changedValue >= 0 ? "+" : "") + changedValue));
-                Pair<Integer, Integer> pair = result.soulsMap.get(stat);
+                Pair<Integer, Integer> pair = result.soulsMap.getOrDefault(stat, Pair.of(0, 0));
                 totalSuccessSouls += pair.getKey();
                 totalSouls += pair.getValue();
                 replaceList.add(Pair.of("%soul_success_" + statName + "%", String.valueOf(pair.getKey())));
@@ -198,12 +222,19 @@ public class GuiStrength implements IGui {
             replaceList.add(Pair.of("%soul_success%", String.valueOf(totalSuccessSouls)));
             replaceList.add(Pair.of("%soul_total%", String.valueOf(totalSouls)));
             boolean isExecuteBeforeMessage = config.isExecuteBeforeMessage();
+            List<String> commands = new ArrayList<>();
+            for (String s : isSuccess ? config.getStrengthSuccessCommands() : config.getTotallyFailCommands()) {
+                for (Pair<String, String> pair : replaceList) {
+                    s = s.replace(pair.getKey(), pair.getValue());
+                }
+                commands.add(s);
+            }
             if (isExecuteBeforeMessage) {
-                Util.runCommands(isSuccess ? config.getStrengthSuccessCommands() : config.getTotallyFailCommands(), player);
+                Util.runCommands(commands, player);
             }
             player.sendMessage(Lang.getList(isSuccess ? "strength.success" : "strength.fail", true, replaceList));
             if (!isExecuteBeforeMessage) {
-                Util.runCommands(isSuccess ? config.getStrengthSuccessCommands() : config.getTotallyFailCommands(), player);
+                Util.runCommands(commands, player);
             }
         }
     }
@@ -212,12 +243,12 @@ public class GuiStrength implements IGui {
         int finalMoney;
         int finalPoints;
         Map<IModSupport.IvsEvsStats, Integer> finalIvsMap;
-        Map<Integer, ItemStack> finalItems;
+        Map<Integer, Integer> finalItems;
         Map<IModSupport.IvsEvsStats, Pair<Integer, Integer>> soulsMap;
 
         private FinalResult(int finalMoney, int finalPoints,
                     Map<IModSupport.IvsEvsStats, Integer> finalIvsMap,
-                    Map<Integer, ItemStack> finalItems,
+                    Map<Integer, Integer> finalItems,
                     Map<IModSupport.IvsEvsStats, Pair<Integer, Integer>> soulsMap) {
             this.finalMoney = finalMoney;
             this.finalPoints = finalPoints;
@@ -231,13 +262,14 @@ public class GuiStrength implements IGui {
         }
 
         static FinalResult get(Inventory inv, Pokemon pokemon, boolean onlyMoney) {
+            if (inv == null || pokemon == null) return null;
             IModSupport mod = PixelmonStrengthen.getInstance().getModSupport();
             Config config = PixelmonStrengthen.getInstance().getPluginConfig();
             Config.PokemonSettings settings = config.getPokemonSettings(pokemon);
             boolean isRemoveAllSouls = config.isRemoveAllSouls();
             int souls = 0;
             Map<IModSupport.IvsEvsStats, Integer> finalIvsMap = new HashMap<>();
-            Map<Integer, ItemStack> finalItems = new HashMap<>();
+            Map<Integer, Integer> finalItems = new HashMap<>();
             Map<IModSupport.IvsEvsStats, Pair<Integer, Integer>> soulsMap = new HashMap<>();
             // 计算六格增加的个体值
             for (int i = 0; i < 6; i++) {
@@ -250,44 +282,47 @@ public class GuiStrength implements IGui {
                 souls += totalAmount;
                 // 计算概率部分，只更新要花费的金钱时无需执行
                 if (onlyMoney) continue;
+                int amount = totalAmount;
                 IModSupport.IvsEvsStats type = IModSupport.IvsEvsStats.get(i);
                 int ivs = mod.getIvs(pokemon, type);
                 boolean success = false;
-                // 单独计算概率
-                if (settings.isSingleRate) {
-                    for (int j = 0; j < item.getAmount(); j++) {
-                        if (Util.isRateAccess(settings)) continue;
-                        success = true;
-                        ivs += soulIvs.get();
-                        singleAmount++;
-                        if (!isRemoveAllSouls) {
-                            item.setAmount(item.getAmount() - 1);
-                        }
-                        if (ivs >= 31) {
-                            ivs = 31;
-                            break;
-                        }
+                if(ivs < 31) {
+                    // 单独计算概率
+                    if (settings.isSingleRate) {
+                        for (int j = 0; j < item.getAmount(); j++) {
+                            if (Util.isRateAccess(settings)) continue;
+                            success = true;
+                            ivs += soulIvs.get();
+                            singleAmount++;
+                            if (!isRemoveAllSouls) {
+                                amount--;
+                            }
+                            if (ivs >= 31) {
+                                ivs = 31;
+                                break;
+                            }
 
-                    }
-                }
-                // 统一计算概率
-                else if (Util.isRateAccess(settings)) {
-                    success = true;
-                    for (int j = 0; j < item.getAmount(); j++) {
-                        ivs += soulIvs.get();
-                        singleAmount++;
-                        if (!isRemoveAllSouls) {
-                            item.setAmount(item.getAmount() - 1);
                         }
-                        if (ivs >= 31) {
-                            ivs = 31;
-                            break;
+                    }
+                    // 统一计算概率
+                    else if (Util.isRateAccess(settings)) {
+                        success = true;
+                        for (int j = 0; j < item.getAmount(); j++) {
+                            ivs += soulIvs.get();
+                            singleAmount++;
+                            if (!isRemoveAllSouls) {
+                                amount--;
+                            }
+                            if (ivs >= 31) {
+                                ivs = 31;
+                                break;
+                            }
                         }
                     }
                 }
                 if (success) finalIvsMap.put(type, ivs);
                 soulsMap.put(type, Pair.of(singleAmount, totalAmount));
-                finalItems.put(28 + i, isRemoveAllSouls || item.getAmount() <= 0 ? null : item);
+                finalItems.put(28 + i, isRemoveAllSouls ? 0 : Math.max(0, amount));
             }
             return new FinalResult(
                     (settings.isSingleMoney ? souls : 1) * settings.useMoney,
@@ -298,6 +333,9 @@ public class GuiStrength implements IGui {
 
     @Override
     public void onClose(InventoryCloseEvent event) {
+        if (updateTask != null){
+            updateTask.cancel();
+        }
         Inventory inv = event.getInventory();
         List<ItemStack> items = new ArrayList<>();
         for (int i = 28; i < 34; i++) {

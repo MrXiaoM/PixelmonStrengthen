@@ -253,6 +253,9 @@ public class ItemStackUtil {
     public static ItemStack build(Player player, Material material, int id, int data, int amount, String display, List<String> lore, List<Pair<String, String>> loreReplaceList, boolean glow) {
         ItemStack item = decideItem(material, id, data, amount);
         ItemMeta im = getItemMeta(item);
+        for (Pair<String, String> pair : loreReplaceList) {
+            display = display.replace(pair.getKey(), pair.getValue());
+        }
         im.setDisplayName(ChatColor.translateAlternateColorCodes('&', display));
         List<String> loreList = new ArrayList<>();
         for (String s : lore) {

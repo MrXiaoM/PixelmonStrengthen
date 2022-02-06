@@ -101,8 +101,7 @@ public class Commands implements TabCompleter, CommandExecutor {
                                 if (baseName.contains(" ")) {
                                     int amount = item.getAmount();
                                     baseName = baseName.substring(0, baseName.indexOf(" "));
-                                    ItemStack finalItem = plugin.getPluginConfig().getPokemonSoul(player, baseName, ivs);
-                                    finalItem.setAmount(amount);
+                                    ItemStack finalItem = plugin.getPluginConfig().getPokemonSoul(player, baseName, ivs, amount);
                                     player.getInventory().setItemInMainHand(finalItem);
                                     player.sendMessage(Lang.get("old-converted", true).replace("%amount%", String.valueOf(amount)));
                                     return true;
@@ -141,7 +140,7 @@ public class Commands implements TabCompleter, CommandExecutor {
                             }
                             player.sendMessage("baseName: " + plugin.getModSupport().getPokemonBaseName(pokemon));
                             player.sendMessage("translateName: " + Lang.getPokemonTranslateName(pokemon));
-                            player.sendMessage("displayName: " + pokemon.getDisplayName());
+                            player.sendMessage("displayName: " + (pokemon.getNickname() != null ? pokemon.getNickname() : Lang.getPokemonTranslateName(pokemon)));
                             return true;
                         }
                         player.sendMessage("查看宝可梦名称: /ps debug pokemon <格数>");

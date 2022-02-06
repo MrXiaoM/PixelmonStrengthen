@@ -28,7 +28,8 @@ soul:
   # HIDE_POTION_EFFECTS(隐藏药水效果描述), HIDE_UNBREAKABLE(隐藏无法破坏描述)
   flags:
     - HIDE_ENCHANTS
-
+# “开始强化”按钮的更新周期，单位是 ticks，20ticks=1秒
+update-period: 5
 # 开启此项，在强化完毕发给玩家结果之前执行命令
 # 关闭此项，在强化完毕发给玩家结果之后执行命令
 execute-before-message: true
@@ -61,6 +62,8 @@ pokemons:
     max-ivs: 186
     # 最多可以强化到多少V，-1代表不限制
     max-v: 3
+    # 分解宝可梦的时候可获得多少个灵魂碎片
+    amount: 2
     # 禁止强化的个体类型，下面的HP是例子，去掉#和[]就是正确的实例
     # HP:生命, Attack:攻击, SpecialAttack:特攻, Defence:防御, SpecialDefence:特防, Speed:速度
     banned-strengh: []

@@ -9,6 +9,7 @@ errors:
   invalid-soul: '&c你放入的物品无法用于强化该精灵'
   no-money: '&c你没有足够的金钱'
   no-points: '&c你没有足够的点券'
+  no-souls: '&c没有放入任何有效的灵魂，无法强化'
   disallow-egg: '&c不允许将蛋强化或分解'
   old_wrong-item: '&c不正确的物品， 无法转换'
 old-converted: '转换完毕，共转换%amount%个碎片'
@@ -74,7 +75,7 @@ gui:
       pokemon:
         material: PIXELMON_PIXELMON_SPRITE
         # %pokemon_display% 是玩家为宝可梦起的名或者默认名
-        name: '&a&l%v% &e&l%pokemon_display% &e&l(%pokemon_name%)'
+        name: '&a&lv%v% &e&l%pokemon_display% &e&l(%pokemon_name%)'
         lore:
           - '&a》&f&l个体值 &8&m                      &f  '
           - '&7  生命: &f%ivs_hp%'
@@ -95,6 +96,11 @@ gui:
       frame:
         material: STAINED_GLASS_PANE
         data: 0
+        name: '&f&l*'
+        lore: []
+      frame-1:
+        material: STAINED_GLASS_PANE
+        data: 7
         name: '&f&l*'
         lore: []
       frame-ivs-hp:
@@ -155,7 +161,7 @@ gui:
       pokemon:
         material: PIXELMON_PIXELMON_SPRITE
         # %pokemon_display% 是玩家为宝可梦起的名或者默认名
-        name: '&a&l%v% &e&l%pokemon_display% &e&l(%pokemon_name%)'
+        name: '&a&lv%v% &e&l%pokemon_display% &e&l(%pokemon_name%)'
         lore:
           - '&a》&f&l个体值 &8&m                      &f  '
           - '&7  生命: &f%ivs_hp%'
@@ -175,7 +181,7 @@ gui:
       pokemon:
         material: PIXELMON_PIXELMON_SPRITE
         # %pokemon_display% 是玩家为宝可梦起的名或者默认名
-        name: '&e&l%pokemon_display% &e&l(%pokemon_name%)'
+        name: '&a&lv%v% &e&l%pokemon_display% &e&l(%pokemon_name%)'
         lore:
           - '§a§l点击将此精灵转换成精灵灵魂 *%amount%'
           - '§a§l本精灵的灵魂单次强化可加 %per% 个体值'
@@ -193,7 +199,7 @@ gui:
       pokemon:
         material: PIXELMON_PIXELMON_SPRITE
         # %pokemon_display% 是玩家为宝可梦起的名或者默认名
-        name: '&e&l%pokemon_display% &e&l(%pokemon_name%)'
+        name: '&a&lv%v% &e&l%pokemon_display% &e&l(%pokemon_name%)'
         lore:
           - '&a》&f&l个体值 &8&m                      &f  '
           - '&7  生命: &f%ivs_hp%'
@@ -205,7 +211,7 @@ gui:
           - '&a》&f&l信息 &8&m                        &f  '
           - '&7  分解后获得 &e灵魂碎片*%amount%'
       confirm:
-        mateial: EMERALD
+        material: EMERALD
         name: '&a&l确认分解'
         lore:
           - '&e点击此处确认分解此精灵'

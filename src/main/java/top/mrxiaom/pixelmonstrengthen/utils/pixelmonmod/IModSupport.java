@@ -65,9 +65,19 @@ public interface IModSupport {
 
     @SuppressWarnings("all")
     static IModSupport decideVersion(Logger logger) {
-        String version = Pixelmon.VERSION;
+        String version = getPixelmonVersion();
         if (logger != null) logger.info("宝可梦Mod版本: " + version);
-        // 接口变动后将添加新的实现
-        return new V820();
+        IModSupport modVersion;
+        if(version.equalsIgnoreCase("8.3.6")) modVersion = new V836();
+        else modVersion = new V820();
+        logger.info("最终使用的宝可梦API: " + modVersion.getClass().getSimpleName());
+        return modVersion;
+    }
+    static String getPixelmonVersion() {
+        try {
+            return (String) Pixelmon.class.getDeclaredField("VERSION").get(null);
+        } catch (Throwable ignored) {
+            return "8.2.0";
+        }
     }
 }

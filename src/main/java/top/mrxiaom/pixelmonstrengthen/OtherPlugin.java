@@ -32,7 +32,7 @@ public class OtherPlugin {
         if (Bukkit.getPluginManager().getPlugin("PlayerPoints") != null) {
             hasPlayerPoints = true;
             pointsApi = ((PlayerPoints) Bukkit.getPluginManager().getPlugin("PlayerPoints")).getAPI();
-            this.getLogger().info("已将 PlaceholderAPI 作为前置");
+            this.getLogger().info("已将 PlayerPoints 作为前置");
         }
     }
 
