@@ -5,7 +5,7 @@
 
 ## 重构
 
-PixelmonStrength 终于重构啦! 版本号直接加到 2.0， 移除了大量屎山代码，修复了若干bug，而且B格看起来更高了，用上 gradle 了，泪目。
+PixelmonStrengthen 终于重构啦! 版本号直接加到 2.0， 移除了大量屎山代码，修复了若干bug，而且B格看起来更高了，用上 gradle 了，泪目。
 
 ## 构建
 

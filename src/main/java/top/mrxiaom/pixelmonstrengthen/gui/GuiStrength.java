@@ -268,6 +268,7 @@ public class GuiStrength implements IGui {
             Config.PokemonSettings settings = config.getPokemonSettings(pokemon);
             boolean isRemoveAllSouls = config.isRemoveAllSouls();
             int souls = 0;
+            Map<IModSupport.IvsEvsStats, Integer> oldIvsMap = mod.getIvs(pokemon);
             Map<IModSupport.IvsEvsStats, Integer> finalIvsMap = new HashMap<>();
             Map<Integer, Integer> finalItems = new HashMap<>();
             Map<IModSupport.IvsEvsStats, Pair<Integer, Integer>> soulsMap = new HashMap<>();
@@ -286,7 +287,11 @@ public class GuiStrength implements IGui {
                 IModSupport.IvsEvsStats type = IModSupport.IvsEvsStats.get(i);
                 int ivs = mod.getIvs(pokemon, type);
                 boolean success = false;
-                if(ivs < 31) {
+                int totalIvs = getTotalIvs(oldIvsMap, finalIvsMap);
+                int totalV = getTotalV(oldIvsMap, finalIvsMap);
+                // 检查是否可强化该类型
+                // 检查是否超过个体限制
+                if (!settings.bannedStrength.contains(type) && totalIvs < settings.maxIvs && totalV < settings.maxV &&  ivs < 31) {
                     // 单独计算概率
                     if (settings.isSingleRate) {
                         for (int j = 0; j < item.getAmount(); j++) {
@@ -301,7 +306,10 @@ public class GuiStrength implements IGui {
                                 ivs = 31;
                                 break;
                             }
-
+                            // 检查是否超过个体限制
+                            totalIvs = getTotalIvs(oldIvsMap, finalIvsMap, type, ivs);
+                            totalV = getTotalV(oldIvsMap, finalIvsMap, type, ivs);
+                            if (totalIvs >= settings.maxIvs || totalV >= settings.maxV) break;
                         }
                     }
                     // 统一计算概率
@@ -317,6 +325,10 @@ public class GuiStrength implements IGui {
                                 ivs = 31;
                                 break;
                             }
+                            // 检查是否超过个体限制
+                            totalIvs = getTotalIvs(oldIvsMap, finalIvsMap, type, ivs);
+                            totalV = getTotalV(oldIvsMap, finalIvsMap, type, ivs);
+                            if (totalIvs >= settings.maxIvs || totalV >= settings.maxV) break;
                         }
                     }
                 }
@@ -328,6 +340,38 @@ public class GuiStrength implements IGui {
                     (settings.isSingleMoney ? souls : 1) * settings.useMoney,
                     (settings.isSingleMoney ? souls : 1) * settings.usePoints,
                     finalIvsMap, finalItems, soulsMap);
+        }
+
+        static int getTotalIvs(Map<IModSupport.IvsEvsStats, Integer> oldIvsMap, Map<IModSupport.IvsEvsStats, Integer> finalIvsMap) {
+            return getTotalIvs(oldIvsMap, finalIvsMap, null, 0);
+        }
+
+        static int getTotalIvs(Map<IModSupport.IvsEvsStats, Integer> oldIvsMap, Map<IModSupport.IvsEvsStats, Integer> finalIvsMap, IModSupport.IvsEvsStats extra, int extraIvs) {
+            int ivs = 0;
+            for(IModSupport.IvsEvsStats stat : oldIvsMap.keySet()) {
+                if (stat.equals(extra)){
+                    ivs += extraIvs;
+                    continue;
+                }
+                ivs += finalIvsMap.getOrDefault(stat, oldIvsMap.get(stat));
+            }
+            return ivs;
+        }
+
+        static int getTotalV(Map<IModSupport.IvsEvsStats, Integer> oldIvsMap, Map<IModSupport.IvsEvsStats, Integer> finalIvsMap) {
+            return getTotalV(oldIvsMap, finalIvsMap, null, 0);
+        }
+
+        static int getTotalV(Map<IModSupport.IvsEvsStats, Integer> oldIvsMap, Map<IModSupport.IvsEvsStats, Integer> finalIvsMap, IModSupport.IvsEvsStats extra, int extraIvs) {
+            int v = 0;
+            for(IModSupport.IvsEvsStats stat : oldIvsMap.keySet()) {
+                if (stat.equals(extra) && extraIvs == 31) {
+                    v++;
+                    continue;
+                }
+                if(finalIvsMap.getOrDefault(stat, oldIvsMap.get(stat)) == 31) v++;
+            }
+            return v;
         }
     }
 

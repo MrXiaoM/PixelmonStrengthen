@@ -35,8 +35,7 @@ update-period: 5
 execute-before-message: true
 # 强化成功后执行的命令
 # 详细编写规则请见发布帖
-strength-success-commands:
-  - 'console:alert %player_name% 强化 %pokemon_display% 成功! '
+strength-success-commands: []
 # 强化完全失败后执行的命令
 totally-fail-commands: []
 # 强化成功后移除所有灵魂，不管它们有没有向本次强化有效地提供个体值

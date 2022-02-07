@@ -11,8 +11,11 @@ import org.bukkit.inventory.ItemStack;
 import top.mrxiaom.pixelmonstrengthen.Config;
 import top.mrxiaom.pixelmonstrengthen.Lang;
 import top.mrxiaom.pixelmonstrengthen.PixelmonStrengthen;
+import top.mrxiaom.pixelmonstrengthen.utils.Pair;
 import top.mrxiaom.pixelmonstrengthen.utils.pixelmonmod.IModSupport;
 import top.mrxiaom.pixelmonstrengthen.utils.ItemStackUtil;
+
+import java.util.List;
 
 public class GuiDecomposePokemon implements IGui {
     Player player;
@@ -39,6 +42,10 @@ public class GuiDecomposePokemon implements IGui {
                 if (pokemon == null) continue;
                 if (!config.isAllowEgg() && pokemon.isEgg()) continue;
                 if (!config.checkPermission(player, pokemon)) continue;
+                Config.PokemonSettings settings = config.getPokemonSettings(pokemon);
+                List<Pair<String, String>> replaceList = Lang.getPokemonLoreReplaceList(pokemon);
+                replaceList.add(Pair.of("%per%", String.valueOf(settings.ivs)));
+                replaceList.add(Pair.of("%amount%", String.valueOf(settings.amount)));
                 ItemStack item = Lang.getItem("gui.decompose.items.pokemon", player, Lang.getPokemonLoreReplaceList(pokemon));
                 if (item.getType().name().equalsIgnoreCase("PIXELMON_PIXELMON_SPRITE")) {
                     item = mod.toPokemonPhoto(item, pokemon);
