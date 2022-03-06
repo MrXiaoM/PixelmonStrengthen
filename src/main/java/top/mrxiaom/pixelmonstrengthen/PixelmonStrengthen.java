@@ -1,6 +1,8 @@
 package top.mrxiaom.pixelmonstrengthen;
 
+import com.pixelmonmod.pixelmon.Pixelmon;
 import com.pixelmonmod.pixelmon.api.pokemon.Pokemon;
+import com.pixelmonmod.pixelmon.api.pokemon.PokemonSpec;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.java.JavaPlugin;
 import top.mrxiaom.pixelmonstrengthen.gui.GuiManager;
@@ -15,6 +17,7 @@ public final class PixelmonStrengthen extends JavaPlugin {
     GuiManager guiManager;
     Commands commands;
     Config pluginConfig;
+    PlayerData playerData;
     OtherPlugin otherPlugin;
 
     @Override
@@ -23,7 +26,8 @@ public final class PixelmonStrengthen extends JavaPlugin {
         guiManager = new GuiManager(this);
         commands = new Commands(this);
         pluginConfig = new Config(this);
-        pluginConfig.reloadConfig();
+        playerData = new PlayerData(this);
+        this.reloadConfig();
         otherPlugin = new OtherPlugin(this.getLogger());
         INSTANCE = this;
     }
@@ -31,6 +35,13 @@ public final class PixelmonStrengthen extends JavaPlugin {
     @Override
     public void onDisable() {
         guiManager.closeAllGui();
+    }
+
+    public void reloadConfig() {
+        super.saveDefaultConfig();
+        super.reloadConfig();
+        pluginConfig.reloadConfig();
+        playerData.reloadAllConfig();
     }
 
     public Optional<Integer> checkSoul(ItemStack item, Pokemon pokemon) {
@@ -41,9 +52,17 @@ public final class PixelmonStrengthen extends JavaPlugin {
                 ItemStackUtil.readNBTInt(item, "PokemonSoulIvs") : Optional.empty();
     }
 
+    public boolean isSoul(ItemStack item) {
+        if (item == null) return false;
+        String pokemonSoulType = ItemStackUtil.readNBTString(item, "PokemonSoulType").orElse(null);
+        return pokemonSoulType != null;
+    }
+
     public Config getPluginConfig() {
         return pluginConfig;
     }
+
+    public PlayerData getPlayerData() { return playerData; }
 
     public void setModSupport(IModSupport modSupport) {
         this.modSupport = modSupport;

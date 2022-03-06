@@ -35,8 +35,8 @@ public class Config {
         public boolean isSingleMoney;
         public int usePoints;
         public boolean isSinglePoints;
-
-        public PokemonSettings(double rate, boolean isSingleRate, int ivs, int maxIvs, int maxV, int amount, List<IModSupport.IvsEvsStats> bannedStrength, int useMoney, boolean isSingleMoney, int usePoints, boolean isSinglePoints) {
+        public String override;
+        public PokemonSettings(double rate, boolean isSingleRate, int ivs, int maxIvs, int maxV, int amount, List<IModSupport.IvsEvsStats> bannedStrength, int useMoney, boolean isSingleMoney, int usePoints, boolean isSinglePoints, String override) {
             this.rate = rate;
             this.isSingleRate = isSingleRate;
             this.ivs = ivs;
@@ -48,13 +48,17 @@ public class Config {
             this.isSingleMoney = isSingleMoney;
             this.usePoints = usePoints;
             this.isSinglePoints = isSinglePoints;
+            this.override = override;
         }
     }
 
     enum BanMode {
         BLACKLIST, WHITELIST
     }
-
+    boolean isUseVisualMode;
+    boolean isUseClassicMode;
+    boolean isAllowVisualDecompose;
+    boolean isAllowClassicDecompose;
     boolean isRemoveAllSouls;
     boolean isAllowEgg;
     boolean isExecuteBeforeMessage;
@@ -72,29 +76,29 @@ public class Config {
     }
 
     public PokemonSettings getPokemonSettings(String baseName) {
-        double rate = config.getDouble("pokemons." + baseName + ".rate", config.getDouble("pokemons.default.rate", 100.0d));
-        boolean isSingleRate = config.getBoolean("pokemons." + baseName + ".single-rate", config.getBoolean("pokemons.default.single-rate", false));
-        int ivs = config.getInt("pokemons." + baseName + ".ivs", config.getInt("pokemons.default.ivs", 1));
-        int maxIvs = config.getInt("pokemons." + baseName + ".max-ivs", config.getInt("pokemons.default.max-ivs", 186));
-        int maxV = config.getInt("pokemons." + baseName + ".max-v", config.getInt("pokemons.default.max-v", 3));
-        int amount = config.getInt("pokemons." + baseName + ".amount", config.getInt("pokemons.default.amount", 2));
-        int useMoney = config.getInt("pokemons." + baseName + ".use-money", config.getInt("pokemons.default.use-money", 100));
-        boolean isSingleMoney = config.getBoolean("pokemons." + baseName + ".single-money", config.getBoolean("pokemons.default.single-money", false));
-        int usePoints = config.getInt("pokemons." + baseName + ".use-points", config.getInt("pokemons.default.use-points", 0));
-        boolean isSinglePoints = config.getBoolean("pokemons." + baseName + ".single-points", config.getBoolean("pokemons.default.single-points", false));
+        String root = "pokemons." + baseName + ".";
+        double rate = config.getDouble(root + "rate", config.getDouble("pokemons.default.rate", 100.0d));
+        boolean isSingleRate = config.getBoolean(root + "single-rate", config.getBoolean("pokemons.default.single-rate", false));
+        int ivs = config.getInt(root + "ivs", config.getInt("pokemons.default.ivs", 1));
+        int maxIvs = config.getInt(root + "max-ivs", config.getInt("pokemons.default.max-ivs", 186));
+        int maxV = config.getInt(root + "max-v", config.getInt("pokemons.default.max-v", 3));
+        int amount = config.getInt(root + "amount", config.getInt("pokemons.default.amount", 2));
+        int useMoney = config.getInt(root + "use-money", config.getInt("pokemons.default.use-money", 100));
+        boolean isSingleMoney = config.getBoolean(root + "single-money", config.getBoolean("pokemons.default.single-money", false));
+        int usePoints = config.getInt(root + "use-points", config.getInt("pokemons.default.use-points", 0));
+        boolean isSinglePoints = config.getBoolean(root + "single-points", config.getBoolean("pokemons.default.single-points", false));
         List<IModSupport.IvsEvsStats> bannedStrength = new ArrayList<>();
-        List<String> banned = config.contains("pokemons." + baseName + ".banned-strength") && config.isList("pokemons." + baseName + ".banned-strength") ? config.getStringList("pokemons." + baseName + ".banned-strength")
+        List<String> banned = config.contains(root + "banned-strength") && config.isList(root + "banned-strength") ? config.getStringList(root + "banned-strength")
                 : (config.contains("pokemons.default.banned-strength") && config.isList("pokemons.default.banned-strength") ? config.getStringList("pokemons.default.banned-strength") : new ArrayList<>());
         for (String s : banned) {
             Optional<IModSupport.IvsEvsStats> stats = Util.valueOf(IModSupport.IvsEvsStats.class, s);
             stats.ifPresent(bannedStrength::add);
         }
-        return new PokemonSettings(rate, isSingleRate, ivs, maxIvs, maxV, amount, bannedStrength, useMoney, isSingleMoney, usePoints, isSinglePoints);
+        String override = config.getString(root + "override", baseName);
+        return new PokemonSettings(rate, isSingleRate, ivs, maxIvs, maxV, amount, bannedStrength, useMoney, isSingleMoney, usePoints, isSinglePoints, override);
     }
 
     public Config reloadConfig() {
-        plugin.saveDefaultConfig();
-        plugin.reloadConfig();
         config = plugin.getConfig();
         // 处理旧的配置文件
         if (config.contains("soul-item-id")) {
@@ -110,6 +114,10 @@ public class Config {
             return this;
         }
         Lang.loadLanguage(plugin);
+        isUseVisualMode = config.getBoolean("visual-mode", false);
+        isUseClassicMode = config.getBoolean("classic-mode", true);
+        isAllowVisualDecompose = config.getBoolean("allow-visual-decompose", true);
+        isAllowClassicDecompose = config.getBoolean("allow-classic-decompose", true);
         isAllowEgg = config.getBoolean("is-allow-egg", false);
         isRemoveAllSouls = config.getBoolean("remove-all-souls", false);
         isExecuteBeforeMessage = config.getBoolean("execute-before-message", true);
@@ -122,8 +130,7 @@ public class Config {
 
     public ItemStack getPokemonSoul(Player player, Pokemon pokemon) {
         PokemonSettings settings = getPokemonSettings(pokemon);
-        String baseName = plugin.getModSupport().getPokemonBaseName(pokemon);
-        return getPokemonSoul(player, baseName, settings.ivs, settings.amount);
+        return getPokemonSoul(player, settings.override, settings.ivs, settings.amount);
     }
 
     public ItemStack getPokemonSoul(Player player, String baseName, int perIvs, int amount) {
@@ -131,19 +138,29 @@ public class Config {
     }
 
     public ItemStack getPokemonSoul(Player player, String baseName, String name, int perIvs, int amount) {
+        return getPokemonSoul(player, baseName, name, perIvs, amount, false);
+    }
+
+    public ItemStack getPokemonSoul(Player player, String baseName, String name, int perIvs, int amount, boolean visual) {
         List<Pair<String, String>> replaceList = Lists.newArrayList(
                 Pair.of("%pokemon_name%", name),
                 Pair.of("%pokemon_basename%", baseName),
                 Pair.of("%pokemon_soul_per_ivs%", String.valueOf(perIvs))
         );
-        Object material = config.get("soul.material");
-        int data = config.getInt("soul.data", 0);
-        String display = config.getString("soul.name");
+        if (visual) {
+            replaceList.addAll(Lists.newArrayList(
+                    Pair.of("%amount%", String.valueOf(amount))
+            ));
+        }
+        String root = (visual ? "visual-" : "") + "soul.";
+        Object material = config.get(root + "material");
+        int data = config.getInt(root + "data", 0);
+        String display = config.getString(root + "name");
         for (Pair<String, String> pair : replaceList) {
             display = display.replace(pair.getKey(), pair.getValue());
         }
         display = Util.handlePlaceholders(player, display);
-        List<String> lore = config.getStringList("soul.lore");
+        List<String> lore = config.getStringList(root + "lore");
         ItemStack item;
         if (material instanceof Integer) {
             int id = (Integer) material;
@@ -158,7 +175,7 @@ public class Config {
             item = ItemStackUtil.build(player, m, data, 1, display, lore, replaceList);
         }
         item.setAmount(Math.max(1, Math.min(amount, 64)));
-        for (String s : config.getStringList("soul.enchants")) {
+        for (String s : config.getStringList(root + "enchants")) {
             if (s.contains(":")) {
                 Optional<Enchantment> ench = ItemStackUtil.getEnchantment(s.substring(0, s.indexOf(":")));
                 if (ench.isPresent()) {
@@ -169,13 +186,15 @@ public class Config {
             }
         }
         ItemMeta meta = ItemStackUtil.getItemMeta(item);
-        for (String s : config.getStringList("soul.flags")) {
+        for (String s : config.getStringList(root + "flags")) {
             Optional<ItemFlag> flag = Util.valueOf(ItemFlag.class, s);
             flag.ifPresent(meta::addItemFlags);
         }
         item.setItemMeta(meta);
-        item = ItemStackUtil.writeNBT(item, "PokemonSoulType", baseName.toLowerCase());
-        item = ItemStackUtil.writeNBT(item, "PokemonSoulIvs", perIvs);
+        if (!visual) {
+            item = ItemStackUtil.writeNBT(item, "PokemonSoulType", baseName.toLowerCase());
+            item = ItemStackUtil.writeNBT(item, "PokemonSoulIvs", perIvs);
+        }
         return item;
     }
 
@@ -186,6 +205,22 @@ public class Config {
         } else {
             return !player.hasPermission("pixelmonstrengthen.blacklist." + baseName);
         }
+    }
+
+    public boolean isUseVisualMode() {
+        return isUseVisualMode;
+    }
+
+    public boolean isUseClassicMode() {
+        return isUseClassicMode;
+    }
+
+    public boolean isAllowVisualDecompose() {
+        return isAllowVisualDecompose;
+    }
+
+    public boolean isAllowClassicDecompose() {
+        return isAllowClassicDecompose;
     }
 
     public boolean isRemoveAllSouls() {

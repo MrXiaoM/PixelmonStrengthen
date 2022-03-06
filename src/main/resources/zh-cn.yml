@@ -12,6 +12,7 @@ errors:
   no-souls: '&c没有放入任何有效的灵魂，无法强化'
   disallow-egg: '&c不允许将蛋强化或分解'
   old_wrong-item: '&c不正确的物品， 无法转换'
+  no-soul: '&c请手持要放入仓库的灵魂碎片'
 old-converted: '转换完毕，共转换%amount%个碎片'
 help:
   - '帮助命令'
@@ -133,6 +134,18 @@ gui:
         data: 10
         name: '&b&l↓↓ 速度 ↓↓'
         lore: []
+      button-visual-soul:
+        material: STAINED_GLASS_PANE
+        data: 10
+        name: '&b加入虚拟灵魂碎片'
+        lore:
+          - '&7已选择: &f%selected% &7(剩余%amount%)'
+          - '&7已放入: (%put_total_amount%个)'
+          - '&f  %put_name% &7*%put_amount%'
+          - ''
+          - '&a左键 &7| &f放入1个已选择的灵魂'
+          - '&b右键 &7| &f取出1个已选择的灵魂'
+          - '&eShift+左键 &7| &f更换选择的灵魂'
       start:
         material: STAINED_GLASS_PANE
         data: 5
@@ -218,3 +231,29 @@ gui:
           - '§c§l此操作是不可逆的!! 请慎重操作!!'
           - '§c§l此操作是不可逆的!! 请慎重操作!!'
           - '§c§l此操作是不可逆的!! 请慎重操作!!'
+  storage:
+    title: '灵魂仓库 第%page%页'
+    items:
+      frame:
+        material: STAINED_GLASS_PANE
+        data: 7
+        name: '&f&l*'
+        lore: []
+      prev-page:
+        material: STAINED_GLASS_PANE
+        data: 5
+        name: '&e上一页'
+        lore: []
+      next-page:
+        material: STAINED_GLASS_PANE
+        data: 5
+        name: '&e下一页'
+        lore: []
+      # 一个自定义按钮，在最下面一行的中间显示，可以做返回菜单之类的
+      # commands 填写规则和配置文件里的一样详见插件帖子
+      custom:
+        material: STAINED_GLASS_PANE
+        data: 7
+        name: '&f&l*'
+        lore: []
+        commands: []

@@ -10,11 +10,9 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.scheduler.BukkitTask;
-import top.mrxiaom.pixelmonstrengthen.Config;
-import top.mrxiaom.pixelmonstrengthen.Lang;
-import top.mrxiaom.pixelmonstrengthen.OtherPlugin;
-import top.mrxiaom.pixelmonstrengthen.PixelmonStrengthen;
+import top.mrxiaom.pixelmonstrengthen.*;
 import top.mrxiaom.pixelmonstrengthen.utils.pixelmonmod.IModSupport;
 import top.mrxiaom.pixelmonstrengthen.utils.ItemStackUtil;
 import top.mrxiaom.pixelmonstrengthen.utils.Pair;
@@ -28,9 +26,12 @@ public class GuiStrength implements IGui {
     Inventory inventory;
     Pokemon pokemon;
     BukkitTask updateTask;
+    Map<Integer, Pair<Integer, List<String>>> visualSelection = new HashMap<>();
+    Map<Integer, Map<String, Integer>> visualSouls = new HashMap<>();
     public GuiStrength(Player player, int slot) {
         this.player = player;
         this.slot = slot;
+        for (int i = 0; i < 6; i++) visualSouls.put(i, new HashMap<>());
     }
 
     @Override
@@ -50,7 +51,8 @@ public class GuiStrength implements IGui {
             player.sendMessage(Lang.get("errors.no-pokemon", true));
             return null;
         }
-        if (!PixelmonStrengthen.getInstance().getPluginConfig().isAllowEgg() && pokemon.isEgg()) {
+        Config config = PixelmonStrengthen.getInstance().getPluginConfig();
+        if (!config.isAllowEgg() && pokemon.isEgg()) {
             player.sendMessage(Lang.get("errors.disallow-egg", true));
             return null;
         }
@@ -73,11 +75,56 @@ public class GuiStrength implements IGui {
         inventory.setItem(22, Lang.getItem("gui.strength.items.frame-ivs-specialattack", player));
         inventory.setItem(23, Lang.getItem("gui.strength.items.frame-ivs-specialdefence", player));
         inventory.setItem(24, Lang.getItem("gui.strength.items.frame-ivs-speed", player));
-        int updatePeriod = PixelmonStrengthen.getInstance().getPluginConfig().getUpdatePeriod();
+        if (config.isUseVisualMode()) {
+            int offset = config.isUseClassicMode() ? 9 : 0;
+
+        }
+        int updatePeriod = config.getUpdatePeriod();
         updateTask = Bukkit.getScheduler().runTaskTimer(PixelmonStrengthen.getInstance(), this::updateStartButton, updatePeriod, updatePeriod);
         return inventory;
     }
 
+    private void updateVisualButtons() {
+        Config config = PixelmonStrengthen.getInstance().getPluginConfig();
+        int offset = 28 + (config.isUseClassicMode() ? 9 : 0);
+        for(int i = 0; i < 6; i++) {
+            inventory.setItem(offset + i, getVisualButton(i));
+        }
+    }
+
+    private ItemStack getVisualButton(int index) {
+        Map<String, Integer> souls = visualSouls.getOrDefault(index, new HashMap<>());
+        Pair<Integer, List<String>> selection = visualSelection.getOrDefault(index, Pair.of(0, new ArrayList<>()));
+        String selected = selection.getValue().size() > 0 ? selection.getValue().get(Math.max(0, selection.getKey()) % (selection.getValue().size() - 1)) : "";
+        Optional<PlayerData.Data> result = PixelmonStrengthen.getInstance().getPlayerData().get(player.getName());
+        int amount = 0;
+        if (result.isPresent()){
+            PlayerData.Data data = result.get();
+            amount = data.getStorage().getOrDefault(selected, 0);
+        }
+        amount -= souls.getOrDefault(selected, 0);
+        int totalAmount = 0;
+        for(int i : souls.values()) totalAmount += i;
+        ItemStack item = Lang.getItem("gui.strength.items.button-visual-soul", player, Lists.newArrayList(
+                Pair.of("%put_total_amount%", String.valueOf(totalAmount)),
+                Pair.of("%selected%", selected),
+                Pair.of("amount", String.valueOf(amount))
+        ));
+        ItemMeta im = ItemStackUtil.getItemMeta(item);
+        List<String> lore = new ArrayList<>();
+        for (String s : im.getLore()) {
+            if (!s.contains("%put_name%")) {
+                lore.add(s);
+                continue;
+            }
+            for (String key : souls.keySet()) {
+                lore.add(s.replace("%put_name%", key).replace("%put_amount%", String.valueOf(souls.get(key))));
+            }
+        }
+        im.setLore(lore);
+        item.setItemMeta(im);
+        return item;
+    }
 
     private void updateStartButton() {
         FinalResult result = FinalResult.get(inventory, pokemon, true);
@@ -104,14 +151,16 @@ public class GuiStrength implements IGui {
             player.closeInventory();
             return;
         }
-        if (!PixelmonStrengthen.getInstance().getPluginConfig().isAllowEgg() && pokemon.isEgg()) {
+        Config config = PixelmonStrengthen.getInstance().getPluginConfig();
+        if (!config.isAllowEgg() && pokemon.isEgg()) {
             player.sendMessage(Lang.get("errors.disallow-egg", true));
             player.closeInventory();
             return;
         }
+        if(!config.isUseClassicMode()) event.setCancelled(true);
         int slot = event.getRawSlot();
         // 设置可点击背包或者放置灵魂的格子
-        if (slot < 28 || (slot > 33 && slot < 54)) {
+        if (config.isUseClassicMode() && (slot < 28 || (slot > 33 && slot < 54))) {
             event.setCancelled(true);
         }
         // 禁止 Shift 点击背包
@@ -119,7 +168,7 @@ public class GuiStrength implements IGui {
             event.setCancelled(true);
         }
         // 检查放置灵魂的格子
-        if (slot >= 28 && slot <= 33) {
+        if (config.isUseClassicMode() && slot >= 28 && slot <= 33) {
             ItemStack cursor = event.getCursor();
             if (cursor == null || cursor.getType().equals(Material.AIR)) return;
             if (!PixelmonStrengthen.getInstance().checkSoul(cursor, pokemon).isPresent()) {
@@ -127,6 +176,50 @@ public class GuiStrength implements IGui {
                 event.setCancelled(true);
             }
             return;
+        }
+        if (config.isUseVisualMode()) {
+            int offset = 28 + (config.isUseClassicMode() ? 9 : 0);
+            // 点击虚拟灵魂碎片操作按钮
+            if (slot >= offset && slot < offset + 6) {
+                int index = slot - offset;
+                Pair<Integer, List<String>> selection = visualSelection.get(index);
+                if (event.isShiftClick()) {
+                    if (event.isLeftClick() && !event.isRightClick()) {
+                        // 切换选择的灵魂碎片
+                        selection.setKey((selection.getKey() + 1) % (selection.getValue().size() - 1));
+                        visualSelection.put(index, selection);
+                        inventory.setItem(slot, getVisualButton(index));
+                        return;
+                    }
+                }
+                else {
+                    if (selection.getValue().isEmpty()) return;
+                    String selected = selection.getValue().get(selection.getKey() % (selection.getValue().size() - 1));
+                    int availableAmount = 0;
+                    Optional<PlayerData.Data> result = PixelmonStrengthen.getInstance().getPlayerData().get(player.getName());
+                    if (result.isPresent()) {
+                        PlayerData.Data data = result.get();
+                        availableAmount = data.getStorage().getOrDefault(selected, 0);
+                    }
+                    Map<String, Integer> souls = visualSouls.get(index);
+                    int amount = souls.getOrDefault(selected, 0);
+                    if (event.isLeftClick() && !event.isRightClick()) {
+                        // 增加
+                        if (amount >= availableAmount) return;
+                        amount++;
+                    }
+                    if (event.isRightClick() && !event.isLeftClick()) {
+                        // 减少
+                        if (amount <= 0) return;
+                        amount--;
+                    }
+                    if (amount > 0) souls.put(selected, amount);
+                    else souls.remove(selected);
+                    visualSouls.put(index, souls);
+                    inventory.setItem(slot, getVisualButton(index));
+                }
+                return;
+            }
         }
         // 开始强化
         if (slot == 25) {
@@ -141,7 +234,6 @@ public class GuiStrength implements IGui {
                 player.sendMessage(Lang.get("errors.no-souls", true));
                 return;
             }
-            Config config = PixelmonStrengthen.getInstance().getPluginConfig();
             OtherPlugin api = PixelmonStrengthen.getInstance().getOtherPlugin();
             Map<IModSupport.IvsEvsStats, Integer> oldIvs = mod.getIvs(pokemon);
             // 计算结果
@@ -232,7 +324,7 @@ public class GuiStrength implements IGui {
             if (isExecuteBeforeMessage) {
                 Util.runCommands(commands, player);
             }
-            player.sendMessage(Lang.getList(isSuccess ? "strength.success" : "strength.fail", true, replaceList));
+            player.sendMessage(Lang.getListAsString(isSuccess ? "strength.success" : "strength.fail", true, replaceList));
             if (!isExecuteBeforeMessage) {
                 Util.runCommands(commands, player);
             }

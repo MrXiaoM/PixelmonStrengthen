@@ -113,9 +113,24 @@ public class Commands implements TabCompleter, CommandExecutor {
                 player.sendMessage(Lang.get("errors.old_wrong-item", true));
                 return true;
             }
+            // 别名 cangku 只是一个历史习惯（
+            if (args[0].equalsIgnoreCase("storage") || args[0].equalsIgnoreCase("cangku")) {
+                if (!isPlayer) return Lang.notPlayer(sender);
+                if (!player.hasPermission("pixelmonstrengthen.storage")) return Lang.noPerm(player);
+                // 将手中精灵碎片放入仓库
+                if (args.length == 2 && args[1].equalsIgnoreCase("put")) {
+                    if (!player.hasPermission("pixelmonstrengthen.storage.put")) return Lang.noPerm(player);
+                    if (!plugin.isSoul(player.getInventory().getItemInMainHand())) {
+                        player.sendMessage(Lang.get("no-soul"));
+                        return true;
+                    }
+                    // TODO
+                }
+                return true;
+            }
             if (args[0].equalsIgnoreCase("reload")) {
                 if (!sender.hasPermission("pixelmonstrengthen.reload")) return Lang.noPerm(sender);
-                plugin.getPluginConfig().reloadConfig();
+                plugin.reloadConfig();
                 sender.sendMessage(Lang.get("reload", true));
                 return true;
             }
@@ -170,7 +185,7 @@ public class Commands implements TabCompleter, CommandExecutor {
                 return true;
             }
         }
-        sender.sendMessage(Lang.getList("help", true));
+        sender.sendMessage(Lang.getListAsString("help", true));
         return false;
     }
 

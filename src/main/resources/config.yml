@@ -8,6 +8,21 @@ lang-file: 'zh-cn.yml'
 # 如果Mod更新了需要更换语言文件，在宝可梦mod里将文件/assets/pixelmon/lang/zh_CN.lang替换过插件目录里的就完事了
 pixelmon-lang: 'zh_CN.lang'
 
+# 是否开启虚拟模式
+# 开启后，可以使用虚拟灵魂碎片进行强化，不占用玩家背包空间
+# 并且会开启灵魂碎片仓库功能
+visual-mode: false
+# 开启虚拟模式后，在分解确认菜单显示“分解为虚拟碎片”
+# 允许通过分解获得虚拟灵魂碎片
+# 否则虚拟灵魂碎片只能通过管理员命令获得
+allow-visual-decompose: true
+# 不管在什么模式，在分解确认菜单显示“分解为物理碎片”
+# 允许通过分解获得灵魂碎片物品
+allow-classic-decompose: true
+# 是否开启经典模式
+# 关闭后，灵魂碎片物品将失效
+classic-mode: true
+
 # 灵魂碎片设置
 # 在确定之后不要随意更改
 soul:
@@ -28,6 +43,20 @@ soul:
   # HIDE_POTION_EFFECTS(隐藏药水效果描述), HIDE_UNBREAKABLE(隐藏无法破坏描述)
   flags:
     - HIDE_ENCHANTS
+# 虚拟灵魂碎片设置
+# 同上，但可随意更改
+visual-soul:
+  material: PIXELMON_PIXELMON_SPRITE
+  name: '&e&l%pokemon_name% 的灵魂'
+  lore:
+    - '&a从 %pokemon_name% 体内提取出的灵魂精华'
+    - '&a可用于强化同类精灵，单个灵魂可强化的点数: &e&l%pokemon_soul_per_ivs%'
+    - ''
+    - '&b拥有数量: &e%amount%'
+    - ''
+    #- '&a左键 &7| &f取出该碎片(全部)'
+  enchants: []
+  flags: []
 # “开始强化”按钮的更新周期，单位是 ticks，20ticks=1秒
 update-period: 5
 # 开启此项，在强化完毕发给玩家结果之前执行命令
@@ -46,6 +75,34 @@ is-allow-egg: false
 # BLACKLIST - 黑名单
 # WHITELIST - 白名单
 ban-mode: BLACKLIST
+# 自定义灵魂碎片
+custom-souls:
+  example1:
+    # 取消注释下面这句，使这个自定义碎片配置基于 example
+    # parent: example
+
+    # 前面的配置格式和灵魂碎片一样
+    material: glowstone_dust
+    name: '&e&l%pokemon_name% 的灵魂'
+    lore:
+      - '&a从 %pokemon_name% 体内提取出的灵魂精华'
+      - '&a可用于强化同类精灵，单个灵魂可强化的点数: &e&l%pokemon_soul_per_ivs%'
+    enchants:
+      - 'DURABILITY:1'
+    flags:
+      - HIDE_ENCHANTS
+    # 允许用来强化的宝可梦
+    # 可以在这里再在原来基础上增加这个碎片特有的配置
+    # 以下例子是这个自定义碎片即可以用来正常强化 百变怪
+    # 也可以用来强化 急冻鸟，不过用这个碎片强化急冻鸟只能加2个体
+    # 可以修改的数值有: rate, single-rate, ivs, max-ivs, max-v, banned-strength, use-money, single-money, use-points, single-points
+    # 正如例子一样，要修改的就加上去，不要修改的就设置为 true
+    enable-pokemons:
+      ditto: true
+      Articuno:
+        ivs: 2
+        single-rate: true
+      Zapdos: true
 # 强化精灵设置 (几率100.0代表100%)
 pokemons:
   # 默认
@@ -76,12 +133,16 @@ pokemons:
     use-points: 0
     # 是否单独计算点券，即总点券 = 数量 * 强化一次单价
     single-points: false
+
   # 下面这个列表几乎包括所有神兽，如有需要自行修改
   # 几率设置为0代表无法强化
   # 像 max-ivs 之类下面列表没有的值，会取默认里的值，如需特殊值请自行添加
   ditto:
     rate: 100.0
     ivs: 5
+    # 分解重写的例子，分解后将给予玩家分解重写指定的碎片
+    # 可以使用宝可梦物种名，也可以用自定义碎片ID
+    override: 'example1'
   Articuno:
     rate: 100.0
     ivs: 5

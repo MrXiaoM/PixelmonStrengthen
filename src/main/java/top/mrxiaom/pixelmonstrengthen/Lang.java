@@ -91,11 +91,11 @@ public class Lang {
         return ChatColor.translateAlternateColorCodes('&', (hasPrefix ? config.getString("prefix", "[404:prefix]") : "") + config.getString(key, "[494:" + key + "]"));
     }
 
-    public static String getList(String key, boolean hasPrefix) {
-        return getList(key, hasPrefix, Lists.newArrayList());
+    public static String getListAsString(String key, boolean hasPrefix) {
+        return getListAsString(key, hasPrefix, Lists.newArrayList());
     }
 
-    public static String getList(String key, boolean hasPrefix, List<Pair<String, String>> replaceList) {
+    public static String getListAsString(String key, boolean hasPrefix, List<Pair<String, String>> replaceList) {
         if (config.contains(key) && config.isList(key)) {
             String prefix = hasPrefix ? config.getString("prefix", "[404:prefix]") : "";
             StringBuilder result = new StringBuilder();
@@ -109,6 +109,24 @@ public class Lang {
             return ChatColor.translateAlternateColorCodes('&', result.toString());
         }
         return "[404:" + key + "]";
+    }
+
+    public static List<String> getList(String key, boolean hasPrefix) {
+        return getList(key, hasPrefix, Lists.newArrayList());
+    }
+    public static List<String> getList(String key, boolean hasPrefix, List<Pair<String, String>> replaceList) {
+        if (config.contains(key) && config.isList(key)) {
+            String prefix = hasPrefix ? config.getString("prefix", "[404:prefix]") : "";
+            List<String> result = new ArrayList<>();
+            for (String s : config.getStringList(key)) {
+                for (Pair<String, String> pair : replaceList) {
+                    s = s.replace(pair.getKey(), pair.getValue());
+                }
+                result.add(ChatColor.translateAlternateColorCodes('&', prefix + s));
+            }
+            return result;
+        }
+        return Lists.newArrayList("[404:" + key + "]");
     }
 
     public static String pokemonGet(String key) {
